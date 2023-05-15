@@ -7,25 +7,22 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 )
 
-type EcsManager interface {
+type ecsClient interface {
 	CreateCluster(ctx context.Context, params *ecs.CreateClusterInput, optFns ...func(*ecs.Options)) (*ecs.CreateClusterOutput, error)
 }
 
-type EcsClient struct {
-	client EcsManager
+type Ecs struct {
+	client ecsClient
 }
 
-func NewEcsClient(cfg aws.Config) *EcsClient {
+func New(cfg aws.Config) *Ecs {
 	client := ecs.NewFromConfig(cfg)
-	return &EcsClient{
+	return &Ecs{
 		client: client,
 	}
 }
 
-func (ec *EcsClient) GetColor(service string) string {
-	return service + "-green"
-}
-func (ec *EcsClient) CreteCluster(ctx context.Context, cluster, service string) string {
+func (ec *Ecs) CreteCluster(ctx context.Context, cluster, service string) string {
 	ec.client.CreateCluster(ctx, &ecs.CreateClusterInput{
 		ClusterName: aws.String(cluster),
 	})

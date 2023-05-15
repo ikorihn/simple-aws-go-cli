@@ -14,7 +14,8 @@ import (
 )
 
 type Runner struct {
-	cfg aws.Config
+	cfg       aws.Config
+	ecsClient awsclient.Ecs
 }
 
 func (r *Runner) Ecs() *cli.Command {
@@ -57,8 +58,8 @@ func (r *Runner) Ecs() *cli.Command {
 
 					fmt.Println(res)
 
-					ecsClient := awsclient.NewEcsClient(r.cfg)
-					ecsClient.GetColor("foo")
+					ctx := context.Background()
+					r.ecsClient.CreteCluster(ctx, "foo", "bar")
 
 					return nil
 
@@ -107,8 +108,11 @@ func main() {
 			stsc := awsclient.NewStsClient(cfg)
 			stsc.SetCredentialProvider(ctx, &cfg, account, iamRole)
 
+			ecsClient := awsclient.NewEcsClient(cfg)
+
 			runner = &Runner{
-				cfg: cfg,
+				cfg:       cfg,
+				ecsClient: *ecsClient,
 			}
 
 			return nil
